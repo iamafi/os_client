@@ -1411,6 +1411,8 @@ class AdministratorScreen(QDialog):
                 self.request_ids.append(book['borrow_request_id'])
                 btn.clicked.connect(lambda state, x=len(self.request_ids) - 1: self.returned(x))
                 self.borrow_table.setCellWidget(row, 4, btn)
+            else:
+                self.borrow_table.removeCellWidget(row, 4)
             if book['status'] == 0:
                 self.borrow_table.item(row, 3).setForeground(QBrush(QColor(137, 137, 137)))
             elif book['status'] == 4:
@@ -1424,7 +1426,6 @@ class AdministratorScreen(QDialog):
 
     def returned(self, request_id):
         try:
-            self.borrow_table.removeCellWidget(request_id, 4)
             request = {
                 'method': 'admin-change-request-status',
                 'session_key': session_key,
