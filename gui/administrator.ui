@@ -36,7 +36,7 @@
     <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="accounts">
     <attribute name="title">
@@ -236,27 +236,27 @@ selection-color: rgb(129, 154, 193);</string>
        </column>
        <item row="0" column="0">
         <property name="text">
-         <string>My test Book</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="1">
         <property name="text">
-         <string>978-3-16-148410-0</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="2">
         <property name="text">
-         <string>Test Test Tes</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="3">
         <property name="text">
-         <string>01.12.2021</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="4">
         <property name="text">
-         <string>14.12.2021</string>
+         <string/>
         </property>
        </item>
       </widget>
@@ -1143,7 +1143,7 @@ selection-color: rgb(129, 154, 193);</string>
        </item>
        <item row="0" column="4">
         <property name="text">
-         <string>Test Test Tes</string>
+         <string/>
         </property>
        </item>
       </widget>

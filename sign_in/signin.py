@@ -1397,7 +1397,7 @@ class AdministratorScreen(QDialog):
         self.borrow_table.setColumnWidth(4, 90)
         self.borrow_table.setRowCount(len(requests))
         row = 0
-        request_ids = []
+        self.request_ids = []
         for book in requests:
             self.borrow_table.setItem(row, 0, QtWidgets.QTableWidgetItem(book['isbn']))
             self.borrow_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['book_name']))
@@ -1408,7 +1408,7 @@ class AdministratorScreen(QDialog):
                 btn.setText('Return')
                 btn.setStyleSheet('background-color: rgb(35, 92, 171); color: rgb(255, 255, 255); '
                                   'border: 1px solid  rgb(255, 255, 255);')
-                request_ids.append(book['borrow_request_id'])
+                self.request_ids.append(book['borrow_request_id'])
                 btn.clicked.connect(lambda state, x=len(self.request_ids) - 1: self.returned(x))
                 self.borrow_table.setCellWidget(row, 4, btn)
             if book['status'] == 0:
