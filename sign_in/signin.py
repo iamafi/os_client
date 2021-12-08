@@ -223,6 +223,8 @@ class StudentScreen(QDialog):
             self.all_books_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
             self.settings.clicked.connect(self.show_settings)
             self.settings_2.clicked.connect(self.show_settings)
+            self.refresh.clicked.connect(self.go_refresh)
+            self.refresh_2.clicked.connect(self.go_refresh)
 
             request = {
                 "method": "student-get",
@@ -309,6 +311,90 @@ class StudentScreen(QDialog):
         except Exception as err:
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def go_refresh(self):
+        request = {
+            "method": "student-get",
+            "session_key": session_key
+        }
+        print('Request:', request)
+        if DEBUG:
+            response = {
+                'result': 'success',
+                'my_borrow_requests': [
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi',
+                        'borrow_date': '13.21.22',
+                        'due_date': '44.53.33',
+                        'status': 0
+                    },
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi',
+                        'borrow_date': '13.21.22',
+                        'due_date': '44.53.33',
+                        'status': 1
+                    },
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi',
+                        'borrow_date': '13.21.22',
+                        'due_date': '44.53.33',
+                        'status': 2
+                    },
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi',
+                        'borrow_date': '13.21.22',
+                        'due_date': '44.53.33',
+                        'status': 3
+                    },
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi',
+                        'borrow_date': '13.21.22',
+                        'due_date': '44.53.33',
+                        'status': 4
+                    },
+                ],
+                'books': [
+                    {
+                        'isbn': 'asdassda11',
+                        'name': 'hhh221h',
+                        'author': 'mafi',
+                        'requested': True
+                    },
+                    {
+                        'isbn': 'asdasaada22',
+                        'name': 'hh355hh',
+                        'author': 'mafi',
+                        'requested': True
+                    },
+                    {
+                        'isbn': 'asdasdsa333s',
+                        'name': 'hh000hh',
+                        'author': 'mafi',
+                        'requested': False
+                    },
+                ]
+            }
+        else:
+            response = send_request(request)
+        print('Response:', response)
+        handle_error(response)
+        if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
+            login = LoginScreen(self.app, self.widget)
+            self.widget.addWidget(login)
+            self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
+        else:
+            self.load_my_books(response["my_borrow_requests"])
+            self.load_all_books(response["books"])
 
     def show_settings(self):
         Settings(self)
@@ -1062,6 +1148,10 @@ class AdministratorScreen(QDialog):
             self.settings_4.clicked.connect(self.show_settings)
             self.add_account.clicked.connect(self.go_add_account)
             self.add_book.clicked.connect(self.go_add_book)
+            self.refresh.clicked.connect(self.go_refresh)
+            self.refresh_2.clicked.connect(self.go_refresh)
+            self.refresh_3.clicked.connect(self.go_refresh)
+            self.refresh_4.clicked.connect(self.go_refresh)
 
             request = {
                 "method": "admin-get",
@@ -1170,6 +1260,112 @@ class AdministratorScreen(QDialog):
         except Exception as err:
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def go_refresh(self):
+        request = {
+            "method": "admin-get",
+            "session_key": session_key
+        }
+        print('Request', request)
+
+        if DEBUG:
+            response = {
+                'result': 'success',
+                'accounts': [
+                    {
+                        'id': '213132',
+                        'name': 'david',
+                        'is_admin': False
+                    },
+                    {
+                        'id': '213112',
+                        'name': 'mafi',
+                        'is_admin': False
+                    },
+                    {
+                        'id': '2132',
+                        'name': 'yasya',
+                        'is_admin': True
+                    }
+                ],
+                'books': [
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi'
+                    },
+                    {
+                        'isbn': 'asdasdads',
+                        'name': 'hhhssh',
+                        'author': 'mafi'
+                    },
+                    {
+                        'isbn': 'asdaaaaaaasdads',
+                        'name': 'hhhh',
+                        'author': 'mafi'
+                    },
+                ],
+                'sorted_borrow_requests': {
+                    'pending': [
+                        {
+                            'borrow_request_id': 22,
+                            'account_id': 'maernk',
+                            'account_name': 'mafi',
+                            'isbn': '3242342fs',
+                            'book_name': 'best',
+                            'status': 1,
+                            'borrow_date': '34-21-131',
+                            'due_date': '23-13-121'
+                        },
+                        {
+                            'borrow_request_id': 23,
+                            'account_id': 'maernk',
+                            'account_name': 'mafi',
+                            'isbn': '3242342fs',
+                            'book_name': 'besaaadt',
+                            'status': 1,
+                            'borrow_date': '34-21-131',
+                            'due_date': '23-13-121'
+                        },
+                    ],
+                    'others': [
+                        {
+                            'borrow_request_id': 25,
+                            'account_id': 'maernk',
+                            'account_name': 'mafi',
+                            'isbn': '3242342fs',
+                            'book_name': 'best',
+                            'status': 2,
+                            'borrow_date': '34-21-131',
+                            'due_date': '23-13-121'
+                        },
+                        {
+                            'borrow_request_id': 26,
+                            'account_id': 'maernk',
+                            'account_name': 'mafi',
+                            'isbn': '3242342fs',
+                            'book_name': 'best',
+                            'status': 3,
+                            'borrow_date': '34-21-131',
+                            'due_date': '23-13-121'
+                        },
+                    ]
+                }
+            }
+        else:
+            response = send_request(request)
+        print('Response:', response)
+        handle_error(response)
+        if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
+            self.hide()
+            login = LoginScreen(self.app, self.widget)
+            self.widget.addWidget(login)
+            self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
+        else:
+            self.load_accounts(response['accounts'])
+            self.load_books(response['books'])
+            self.load_pending(response['sorted_borrow_requests']['pending'])
+            self.load_borrow(response['sorted_borrow_requests']['others'])
 
     def load_pending(self, requests):
         header = self.requests_table.horizontalHeader()
