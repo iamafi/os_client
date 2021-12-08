@@ -1424,6 +1424,7 @@ class AdministratorScreen(QDialog):
 
     def returned(self, request_id):
         try:
+            self.borrow_table.removeCellWidget(request_id, 4)
             request = {
                 'method': 'admin-change-request-status',
                 'session_key': session_key,
