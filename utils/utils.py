@@ -13,7 +13,6 @@ else:
     out_filename = str(sys.argv[1]).strip()
 
 
-
 def send_request(request):
     dump = json.dumps(request)
 
@@ -29,3 +28,4 @@ def send_request(request):
         return response
     except json.decoder.JSONDecodeError as exc:
         print(f'Failed to decode response: {exc}')
+        print(f'Raw data: {data}')
