@@ -3,27 +3,26 @@
 import socket
 import sys
 
-
 JSON_SIZE = 32768
 
 
 def run():
     # Create localhost:8080 socket
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 8080))
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.bind(('localhost', 8080))
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    # Connect to ngrok
-    ngrok_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ngrok_socket.connect((ngrok_address, ngrok_port))
-    print('Connected to ngrok')
+        # Connect to ngrok
+        ngrok_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ngrok_socket.connect((ngrok_address, ngrok_port))
+        print('Connected to ngrok')
 
-    # Listen to connection from localhost:8080
-    server_socket.listen()
-    print('Listening to local port 8080\n')
+        # Listen to connection from localhost:8080
+        server_socket.listen()
+        print('Listening to local port 8080\n')
 
-    while True:
-        client_connection(server_socket, ngrok_socket)
+        while True:
+            client_connection(server_socket, ngrok_socket)
 
 
 def client_connection(server_socket, ngrok_socket):
@@ -35,6 +34,7 @@ def client_connection(server_socket, ngrok_socket):
         request = client_socket.recv(JSON_SIZE)
         if not request:  # Client has disconnected
             print('Client has disconnected')
+            client_socket.close()
             break
         ngrok_socket.sendall(request)
         print('-- Received local request, forwarded it to ngrok')
