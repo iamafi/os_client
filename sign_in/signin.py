@@ -40,6 +40,7 @@ class LoginScreen(QDialog):
         super(LoginScreen, self).__init__()
         loadUi("gui/signin.ui", self)
         self.background_image.setPixmap(QtGui.QPixmap("resources/login_back.png"))
+        self.inha_label.setPixmap(QtGui.QPixmap("resources/iut-logo-blue-min.png"))
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.login_button.clicked.connect(self.login)
         self.account = {}
@@ -56,7 +57,7 @@ class LoginScreen(QDialog):
                     "id": username,
                     "password": password
                 }
-                print('Request:', request)
+
                 if DEBUG:
                     response = {
                         'result': 'success',
@@ -71,7 +72,7 @@ class LoginScreen(QDialog):
                 else:
                     response = send_request(request)
 
-                print('Response:', response)
+
                 handle_error(response)
 
                 if response["result"] == "incorrect-credentials":
@@ -126,7 +127,7 @@ class ChangePassword(QMainWindow):
                 'old_password': old_password,
                 'new_password': new_password
             }
-            print('Request:', request)
+
             if old_password == '' or new_password == '' or repeat_password == '':
                 self.error.setText("Fields cannot be empty")
             elif new_password == repeat_password:
@@ -138,7 +139,7 @@ class ChangePassword(QMainWindow):
                 else:
                     response = send_request(request)
 
-                print('Response:', response)
+
                 handle_error(response)
                 if response['result'] == 'success':
                     session_key = response['session_key']
@@ -190,7 +191,7 @@ class Settings(QMainWindow):
                 "method": "logout",
                 "session_key": session_key
             }
-            print('Request:', request)
+
             if DEBUG:
                 response = {
                     'result': 'success'
@@ -198,7 +199,7 @@ class Settings(QMainWindow):
             else:
                 response = send_request(request)
 
-            print('Response:', response)
+
             self.hide()
 
             login = LoginScreen(parent.app, parent.widget)
@@ -230,7 +231,7 @@ class StudentScreen(QDialog):
                 "method": "student-get",
                 "session_key": session_key
             }
-            print('Request:', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -299,7 +300,7 @@ class StudentScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
                 login = LoginScreen(self.app, self.widget)
@@ -317,7 +318,7 @@ class StudentScreen(QDialog):
             "method": "student-get",
             "session_key": session_key
         }
-        print('Request:', request)
+
         if DEBUG:
             response = {
                 'result': 'success',
@@ -386,7 +387,7 @@ class StudentScreen(QDialog):
             }
         else:
             response = send_request(request)
-        print('Response:', response)
+
         handle_error(response)
         if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
             login = LoginScreen(self.app, self.widget)
@@ -476,7 +477,7 @@ class StudentScreen(QDialog):
                 "session_key": session_key,
                 'isbn': btn.objectName(),
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -545,7 +546,7 @@ class StudentScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
 
             handle_error(response)
             if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
@@ -613,7 +614,7 @@ class AddAccount(QMainWindow):
                     },
                     'password': password
                 }
-                print('Request', request)
+
                 if DEBUG:
                     response = {
                         'result': 'success',
@@ -700,7 +701,7 @@ class AddAccount(QMainWindow):
                     }
                 else:
                     response = send_request(request)
-                print('Response:', response)
+
                 handle_error(response)
 
                 if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
@@ -753,7 +754,7 @@ class AddBook(QMainWindow):
                         'author': author
                     }
                 }
-                print('Request', request)
+
                 if DEBUG:
                     response = {
                         'result': 'success',
@@ -840,7 +841,7 @@ class AddBook(QMainWindow):
                     }
                 else:
                     response = send_request(request)
-                print('Response:', response)
+
                 handle_error(response)
 
                 if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
@@ -888,7 +889,7 @@ class PendingButtonsWidget(QWidget):
                 'borrow_request_id': request_id,
                 'new_status': 2
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -975,7 +976,7 @@ class PendingButtonsWidget(QWidget):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             msg = QMessageBox()
             msg.setWindowTitle("Process Request")
@@ -1009,7 +1010,7 @@ class PendingButtonsWidget(QWidget):
                 'borrow_request_id': request_id,
                 'new_status': 0
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -1096,7 +1097,7 @@ class PendingButtonsWidget(QWidget):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             msg = QMessageBox()
             msg.setWindowTitle("Process Request")
@@ -1157,7 +1158,7 @@ class AdministratorScreen(QDialog):
                 "method": "admin-get",
                 "session_key": session_key
             }
-            print('Request', request)
+
 
             if DEBUG:
                 response = {
@@ -1245,7 +1246,7 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
                 self.hide()
@@ -1266,7 +1267,6 @@ class AdministratorScreen(QDialog):
             "method": "admin-get",
             "session_key": session_key
         }
-        print('Request', request)
 
         if DEBUG:
             response = {
@@ -1354,7 +1354,7 @@ class AdministratorScreen(QDialog):
             }
         else:
             response = send_request(request)
-        print('Response:', response)
+
         handle_error(response)
         if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
             self.hide()
@@ -1431,7 +1431,7 @@ class AdministratorScreen(QDialog):
                 'borrow_request_id': self.request_ids[request_id],
                 'new_status': 3
             }
-            print('Request', request)
+
 
             if DEBUG:
                 response = {
@@ -1519,7 +1519,7 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             msg = QMessageBox()
             msg.setWindowTitle("Process Request")
@@ -1602,7 +1602,7 @@ class AdministratorScreen(QDialog):
                     'is_admin': bool(self.accounts_table.cellWidget(row, 2).currentIndex())
                 }
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -1689,7 +1689,7 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
             msg = QMessageBox()
             msg.setWindowTitle("Edit Account")
@@ -1723,7 +1723,7 @@ class AdministratorScreen(QDialog):
                 "session_key": session_key,
                 'id': btn.objectName()[7:],
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -1810,7 +1810,7 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
 
             msg = QMessageBox()
@@ -1884,7 +1884,7 @@ class AdministratorScreen(QDialog):
                     'author': self.books_table.item(row, 2).text()
                 }
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -1971,7 +1971,6 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
 
             handle_error(response)
             if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
@@ -2002,7 +2001,7 @@ class AdministratorScreen(QDialog):
                 "session_key": session_key,
                 'isbn': btn.objectName()[7:],
             }
-            print('Request', request)
+
             if DEBUG:
                 response = {
                     'result': 'success',
@@ -2089,7 +2088,7 @@ class AdministratorScreen(QDialog):
                 }
             else:
                 response = send_request(request)
-            print('Response:', response)
+
             handle_error(response)
 
             msg = QMessageBox()
