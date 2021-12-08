@@ -858,10 +858,10 @@ class AddBook(QMainWindow):
 
 
 class PendingButtonsWidget(QWidget):
-    def __init__(self, parent=None):
+
+    def __init__(self, parent=None, request_id=None):
         super(PendingButtonsWidget, self).__init__(parent)
         self.parent = parent
-        self.request_ids = parent.request_ids
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -873,8 +873,8 @@ class PendingButtonsWidget(QWidget):
         btn2.setText('✕')
         btn2.setStyleSheet('background-color: rgb(207, 60, 1); color: rgb(255, 255, 255); '
                            'border: 1px solid  rgb(255, 255, 255);')
-        btn1.clicked.connect(lambda state, x=len(self.request_ids) - 1: self.accept(x))
-        btn2.clicked.connect(lambda state, x=len(self.request_ids) - 1: self.reject(x))
+        btn1.clicked.connect(lambda state, x=request_id: self.accept(x))
+        btn2.clicked.connect(lambda state, x=request_id: self.reject(x))
         layout.addWidget(btn1)
         layout.addWidget(btn2)
 
@@ -885,7 +885,7 @@ class PendingButtonsWidget(QWidget):
             request = {
                 'method': 'admin-change-request-status',
                 'session_key': session_key,
-                'borrow_request_id': self.request_ids[request_id],
+                'borrow_request_id': request_id,
                 'new_status': 2
             }
             print('Request', request)
@@ -1006,7 +1006,7 @@ class PendingButtonsWidget(QWidget):
             request = {
                 'method': 'admin-change-request-status',
                 'session_key': session_key,
-                'borrow_request_id': self.request_ids[request_id],
+                'borrow_request_id': request_id,
                 'new_status': 0
             }
             print('Request', request)
@@ -1381,8 +1381,7 @@ class AdministratorScreen(QDialog):
             self.requests_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['book_name']))
             self.requests_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['account_id']))
             self.requests_table.setItem(row, 3, QtWidgets.QTableWidgetItem(STATUS_MAP[book['status']]))
-            self.requests_table.setCellWidget(row, 4, PendingButtonsWidget(self))
-            self.request_ids.append(book['borrow_request_id'])
+            self.requests_table.setCellWidget(row, 4, PendingButtonsWidget(self, book['borrow_request_id']))
             if book['status'] == 1:
                 self.requests_table.item(row, 3).setForeground(QBrush(QColor(233, 164, 30)))
             # TODO button

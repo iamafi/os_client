@@ -36,7 +36,7 @@
     <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="my_books">
     <attribute name="title">
@@ -299,7 +299,7 @@ selection-color: rgb(129, 154, 193);</string>
      </property>
      <property name="font">
       <font>
-       <pointsize>20</pointsize>
+       <pointsize>15</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -310,8 +310,7 @@ selection-color: rgb(129, 154, 193);</string>
      <property name="styleSheet">
       <string notr="true">background-color:   rgb(255, 255, 255);
 color: rgb(28, 99, 183);
-border: 2px solid  rgb(28, 99, 183);
-padding-top: -5px;</string>
+border: 2px solid  rgb(28, 99, 183);</string>
      </property>
      <property name="text">
       <string>⟳</string>
