@@ -1207,11 +1207,11 @@ class AdministratorScreen(QDialog):
             self.borrow_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['book_name']))
             self.borrow_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['account_id']))
             self.borrow_table.setItem(row, 3, QtWidgets.QTableWidgetItem(STATUS_MAP[book['status']]))
-            btn = QPushButton(self)
-            btn.setText('Return')
-            btn.setStyleSheet('background-color: rgb(35, 92, 171); color: rgb(255, 255, 255); '
-                              'border: 1px solid  rgb(255, 255, 255);')
             if book['status'] == 2 or book['status'] == 4:
+                btn = QPushButton(self.borrow_table)
+                btn.setText('Return')
+                btn.setStyleSheet('background-color: rgb(35, 92, 171); color: rgb(255, 255, 255); '
+                                  'border: 1px solid  rgb(255, 255, 255);')
                 request_ids.append(book['borrow_request_id'])
                 btn.clicked.connect(lambda state, x=len(self.request_ids) - 1: self.returned(x))
                 self.borrow_table.setCellWidget(row, 4, btn)
