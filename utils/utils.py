@@ -24,12 +24,11 @@ def send_request(request):
         os.close(in_file_fd)
 
         out_file_fd = os.open(out_filename, os.O_RDONLY)
-        data = os.read(out_file_fd, 32768).decode()
+        data = os.read(out_file_fd, 65536).decode()
         os.close(out_file_fd)
 
         try:
-            response = json.loads(data)
-            return response
+            return json.loads(data)
         except json.decoder.JSONDecodeError as exc:
             return None
     for attempt in range(1, MAX_TRIES+1):
