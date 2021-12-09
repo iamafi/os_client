@@ -754,7 +754,6 @@ class AddBook(QMainWindow):
                         'author': author
                     }
                 }
-
                 if DEBUG:
                     response = {
                         'result': 'success',
