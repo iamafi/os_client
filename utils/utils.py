@@ -15,27 +15,26 @@ else:
 MAX_TRIES = 20
 
 
-def send_request(request):
-    def _send_request(_request):
-        dump = json.dumps(_request)
+def send_request(request, tries=MAX_TRIES):
+    print('Sent request')
+    dump = json.dumps(request)
 
-        in_file_fd = os.open(in_filename, os.O_RDWR)
-        os.write(in_file_fd, dump.encode())
-        os.close(in_file_fd)
+    in_file_fd = os.open(in_filename, os.O_RDWR)
+    os.write(in_file_fd, dump.encode())
+    os.close(in_file_fd)
 
-        out_file_fd = os.open(out_filename, os.O_RDONLY)
-        data = os.read(out_file_fd, 65536).decode()
-        os.close(out_file_fd)
-
-        try:
-            return json.loads(data)
-        except json.decoder.JSONDecodeError as exc:
-            return None
-    for attempt in range(1, MAX_TRIES+1):
-        response = _send_request(request)
-
-        if response is not None:
-            print(f'Success from attempt #{attempt}')
-            return response
-
-    print(f'Failed to decode response')
+    out_file_fd = os.open(out_filename, os.O_RDONLY)
+    data = []
+    piece_of_data = os.read(out_file_fd, 32768).decode()
+    while piece_of_data:
+        data.append(piece_of_data)
+        piece_of_data = os.read(out_file_fd, 32768).decode()
+    data = ''.join(data)
+    os.close(out_file_fd)
+    # print(data)
+    try:
+        response = json.loads(data)
+        print('Received response')
+        return response
+    except json.decoder.JSONDecodeError as exc:
+        print(f'Error parsing response: {exc}')
