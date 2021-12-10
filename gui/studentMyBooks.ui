@@ -36,7 +36,7 @@
     <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="my_books">
     <attribute name="title">
@@ -257,32 +257,32 @@ selection-color: rgb(129, 154, 193);</string>
        </column>
        <item row="0" column="0">
         <property name="text">
-         <string>978-3-16-148410-0</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="1">
         <property name="text">
-         <string>My test Book</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="2">
         <property name="text">
-         <string>Test Test Tes</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="3">
         <property name="text">
-         <string>01.12.2021</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="4">
         <property name="text">
-         <string>14.12.2021</string>
+         <string/>
         </property>
        </item>
        <item row="0" column="5">
         <property name="text">
-         <string>Borrowed</string>
+         <string/>
         </property>
        </item>
       </widget>
@@ -585,6 +585,107 @@ border: 2px solid  rgb(28, 99, 183);</string>
      </property>
      <property name="text">
       <string>⟳</string>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="autoDefault">
+      <bool>true</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>70</y>
+       <width>241</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="refresh_6">
+     <property name="geometry">
+      <rect>
+       <x>710</x>
+       <y>70</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color:   rgb(255, 255, 255);
+color: rgb(28, 99, 183);
+border: 2px solid  rgb(28, 99, 183);</string>
+     </property>
+     <property name="text">
+      <string>❌</string>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="autoDefault">
+      <bool>true</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="refresh_5">
+     <property name="geometry">
+      <rect>
+       <x>750</x>
+       <y>70</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color:   rgb(28, 99, 183);
+color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>🔍</string>
      </property>
      <property name="iconSize">
       <size>
