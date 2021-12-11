@@ -1,5 +1,7 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QBrush
-from PyQt5.QtWidgets import QDialog, QPushButton, QMessageBox, QMainWindow, QComboBox, QBoxLayout, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QDialog, QPushButton, QMessageBox, QMainWindow, QComboBox, QBoxLayout, QWidget, QHBoxLayout, \
+    QTableWidget
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets, QtGui
 import sys
@@ -24,6 +26,13 @@ STATUS_MAP = {
     0: "Rejected",
     4: "Overdue"
 }
+
+
+# Utility function to return proper verbose status
+def verbose_status(borrow_request: dict):
+    status = borrow_request['status']
+    return STATUS_MAP[status] if status != 4 else f'{STATUS_MAP[status]} - {borrow_request["overdue_days"]}d'
+
 
 ROLE_MAP = {
     0: 'Student',
@@ -93,6 +102,7 @@ class LoginScreen(QDialog):
                     self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
 
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -110,6 +120,7 @@ class ChangePassword(QMainWindow):
             self.cancel.clicked.connect(self.cancel_changes)
             self.show()
         except Exception as e:
+            raise e
             print(e)
 
     def cancel_changes(self):
@@ -157,6 +168,7 @@ class ChangePassword(QMainWindow):
             else:
                 self.error.setText('New password does not correspond!')
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.parent.app.exec_())
 
@@ -179,6 +191,7 @@ class Settings(QMainWindow):
             self.change_password.clicked.connect(self.go_change_password)
             self.show()
         except Exception as e:
+            raise e
             print(e)
 
     def go_change_password(self):
@@ -199,13 +212,13 @@ class Settings(QMainWindow):
             else:
                 response = send_request(request)
 
-
             self.hide()
 
             login = LoginScreen(parent.app, parent.widget)
             parent.widget.addWidget(login)
             parent.widget.setCurrentIndex(parent.widget.currentIndex() + 1)
         except Exception as e:
+            raise e
             print(e)
 
 
@@ -226,6 +239,8 @@ class StudentScreen(QDialog):
             self.settings_2.clicked.connect(self.show_settings)
             self.refresh.clicked.connect(self.go_refresh)
             self.refresh_2.clicked.connect(self.go_refresh)
+            self.search_btn.clicked.connect(self.do_search)
+            self.discard_search.clicked.connect(self.clean_search_field)
 
             request = {
                 "method": "student-get",
@@ -309,9 +324,17 @@ class StudentScreen(QDialog):
             else:
                 self.load_my_books(response["my_borrow_requests"])
                 self.load_all_books(response["books"])
+
+            if response['fine_message']:
+                FineMessage(response['fine_message'], response['fine_value'], self)
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def clean_search_field(self):
+        self.search_field.setText('')
+        self.go_refresh()
 
     def go_refresh(self):
         request = {
@@ -417,7 +440,7 @@ class StudentScreen(QDialog):
                 self.my_books_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['author']))
                 self.my_books_table.setItem(row, 3, QtWidgets.QTableWidgetItem(book['borrow_date']))
                 self.my_books_table.setItem(row, 4, QtWidgets.QTableWidgetItem(book['due_date']))
-                self.my_books_table.setItem(row, 5, QtWidgets.QTableWidgetItem(STATUS_MAP[book['status']]))
+                self.my_books_table.setItem(row, 5, QtWidgets.QTableWidgetItem(verbose_status(book)))
                 if book['status'] == 0:
                     self.my_books_table.item(row, 5).setForeground(QBrush(QColor(137, 137, 137)))
                 elif book['status'] == 1:
@@ -432,6 +455,7 @@ class StudentScreen(QDialog):
                 row += 1
 
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -441,7 +465,7 @@ class StudentScreen(QDialog):
             self.all_books_table.setColumnWidth(0, 120)
             header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
             header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-            self.all_books_table.setColumnWidth(3, 90)
+            self.all_books_table.setColumnWidth(4, 90)
             row = 0
             self.all_books_table.setRowCount(len(books))
             self.buttons = []
@@ -449,6 +473,8 @@ class StudentScreen(QDialog):
                 self.all_books_table.setItem(row, 0, QtWidgets.QTableWidgetItem(book['isbn']))
                 self.all_books_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['name']))
                 self.all_books_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['author']))
+                self.all_books_table.setItem(row, 3, QtWidgets.QTableWidgetItem(book['copies_in_stock']))
+
                 btn = QPushButton(self.all_books_table)
                 if book['requested']:
                     btn.setText('Requested')
@@ -463,9 +489,10 @@ class StudentScreen(QDialog):
                 self.buttons.append(btn)
                 btn.clicked.connect(lambda state, x=len(self.buttons) - 1: self.request_book(x))
 
-                self.all_books_table.setCellWidget(row, 3, btn)
+                self.all_books_table.setCellWidget(row, 4, btn)
                 row += 1
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -547,12 +574,14 @@ class StudentScreen(QDialog):
             else:
                 response = send_request(request)
 
-
             handle_error(response)
             if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
                 login = LoginScreen(self.app, self.widget)
                 self.widget.addWidget(login)
                 self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
+            elif response['result'] == 'success-wait':
+                WaitingList(response['message'], self)
+                self.go_refresh()
             else:
                 msg = QMessageBox()
                 msg.setWindowTitle("Book Request")
@@ -568,8 +597,68 @@ class StudentScreen(QDialog):
                 self.load_my_books(response["my_borrow_requests"])
                 self.load_all_books(response["books"])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def do_search(self):
+        filter_by = self.search_field.text()
+
+        request = {
+            'method': 'student-filter-books',
+            'session_key': session_key,
+            'filter_by': filter_by
+        }
+
+        response = send_request(request)
+
+        if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
+            login = LoginScreen(self.app, self.widget)
+            self.widget.addWidget(login)
+            self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
+        else:
+            self.load_all_books(response["books"])
+
+
+class WaitingList(QMainWindow):
+    def __init__(self, message, parent=None):
+        try:
+            super(WaitingList, self).__init__(parent)
+            self.parent = parent
+            loadUi("gui/waitingList.ui", self)
+            self.setWindowTitle("Waiting list")
+            self.setGeometry(230, 100, 350, 346)
+            self.setFixedSize(355, 316)
+            self.cancel_btn.clicked.connect(self.cancel)
+            self.message.setText(message)
+            self.show()
+        except Exception as e:
+            raise e
+            print(e)
+
+    def cancel(self):
+        self.hide()
+
+
+class FineMessage(QMainWindow):
+    def __init__(self, fine_message, fine_value, parent=None):
+        try:
+            super(FineMessage, self).__init__(parent)
+            self.parent = parent
+            loadUi("gui/attention.ui", self)
+            self.setWindowTitle("You have an overdue")
+            self.setGeometry(230, 100, 350, 346)
+            self.setFixedSize(266, 286)
+            self.cancel_btn.clicked.connect(self.cancel)
+            self.fine_message.setText(fine_message)
+            self.fine_value.setText(f'Total: {fine_value} UZS')
+            self.show()
+        except Exception as e:
+            raise e
+            print(e)
+
+    def cancel(self):
+        self.hide()
 
 
 class AddAccount(QMainWindow):
@@ -585,6 +674,7 @@ class AddAccount(QMainWindow):
             self.cancel.clicked.connect(self.cancel_account)
             self.show()
         except Exception as e:
+            raise e
             print(e)
 
     def cancel_account(self):
@@ -714,6 +804,7 @@ class AddAccount(QMainWindow):
                     self.parent.load_accounts(response['accounts'])
                     self.parent.load_books(response['books'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.parent.app.exec_())
 
@@ -726,11 +817,12 @@ class AddBook(QMainWindow):
             loadUi("gui/add_book.ui", self)
             self.setWindowTitle("Add Book")
             self.setGeometry(210, 100, 353, 340)
-            self.setFixedSize(353, 340)
+            self.setFixedSize(353, 378)
             self.add.clicked.connect(self.add_book)
             self.cancel.clicked.connect(self.cancel_book)
             self.show()
         except Exception as e:
+            raise e
             print(e)
 
     def cancel_book(self):
@@ -741,8 +833,10 @@ class AddBook(QMainWindow):
             name = self.name.text()
             isbn = self.isbn.text()
             author = self.author.text()
+            copies_available = int(self.copies_available.text())
+            borrow_days = int(self.borrow_days.text())
 
-            if name == '' or isbn == '' or author == '':
+            if name == '' or isbn == '' or author == '' or copies_available == '' or borrow_days == '':
                 self.error.setText("Fields cannot be empty")
             else:
                 request = {
@@ -751,7 +845,9 @@ class AddBook(QMainWindow):
                     'book': {
                         'isbn': isbn,
                         'name': name,
-                        'author': author
+                        'author': author,
+                        'copies_available': copies_available,
+                        'borrow_days': borrow_days,
                     }
                 }
                 if DEBUG:
@@ -853,6 +949,7 @@ class AddBook(QMainWindow):
                     self.parent.load_accounts(response['accounts'])
                     self.parent.load_books(response['books'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.parent.app.exec_())
 
@@ -989,6 +1086,12 @@ class PendingButtonsWidget(QWidget):
                 self.parent.widget.addWidget(login)
                 self.parent.widget.setCurrentIndex(self.parent.widget.currentIndex() + 1)
                 return
+            elif response['result'] == 'cannot-accept':
+                msg.setWindowTitle('Could not accept')
+                msg.setText('There is no copies of the book available. One of them must be returned first')
+                msg.setIcon(QMessageBox.Critical)
+                msg.exec_()
+                return
             else:
                 msg.setText("Borrow Request was accepted")
                 msg.exec_()
@@ -998,6 +1101,7 @@ class PendingButtonsWidget(QWidget):
             self.parent.load_pending(response['sorted_borrow_requests']['pending'])
             self.parent.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.parent.app.exec_())
 
@@ -1119,6 +1223,7 @@ class PendingButtonsWidget(QWidget):
             self.parent.load_pending(response['sorted_borrow_requests']['pending'])
             self.parent.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.parent.app.exec_())
 
@@ -1152,6 +1257,8 @@ class AdministratorScreen(QDialog):
             self.refresh_2.clicked.connect(self.go_refresh)
             self.refresh_3.clicked.connect(self.go_refresh)
             self.refresh_4.clicked.connect(self.go_refresh)
+            self.search_btn.clicked.connect(self.do_search)
+            self.discard_search.clicked.connect(self.clean_search_field)
 
             request = {
                 "method": "admin-get",
@@ -1258,8 +1365,13 @@ class AdministratorScreen(QDialog):
                 self.load_pending(response['sorted_borrow_requests']['pending'])
                 self.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def clean_search_field(self):
+        self.search_field.setText('')
+        self.go_refresh()
 
     def go_refresh(self):
         request = {
@@ -1400,7 +1512,7 @@ class AdministratorScreen(QDialog):
             self.borrow_table.setItem(row, 0, QtWidgets.QTableWidgetItem(book['isbn']))
             self.borrow_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['book_name']))
             self.borrow_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['account_id']))
-            self.borrow_table.setItem(row, 3, QtWidgets.QTableWidgetItem(STATUS_MAP[book['status']]))
+            self.borrow_table.setItem(row, 3, QtWidgets.QTableWidgetItem(verbose_status(book)))
             if book['status'] == 2 or book['status'] == 4:
                 btn = QPushButton(self.borrow_table)
                 btn.setText('Return')
@@ -1542,6 +1654,7 @@ class AdministratorScreen(QDialog):
             self.load_borrow(response['sorted_borrow_requests']['others'])
 
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -1710,6 +1823,7 @@ class AdministratorScreen(QDialog):
                 self.load_pending(response['sorted_borrow_requests']['pending'])
                 self.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -1837,6 +1951,7 @@ class AdministratorScreen(QDialog):
                 self.load_pending(response['sorted_borrow_requests']['pending'])
                 self.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -1847,12 +1962,21 @@ class AdministratorScreen(QDialog):
         self.books_table.setColumnWidth(2, 140)
         self.books_table.setColumnWidth(3, 90)
         self.books_table.setColumnWidth(4, 90)
+        self.books_table.setColumnWidth(5, 90)
         self.books_table.setRowCount(len(books))
         row = 0
         for book in books:
             self.books_table.setItem(row, 0, QtWidgets.QTableWidgetItem(book['isbn']))
             self.books_table.setItem(row, 1, QtWidgets.QTableWidgetItem(book['name']))
             self.books_table.setItem(row, 2, QtWidgets.QTableWidgetItem(book['author']))
+            self.books_table.setItem(row, 3, QtWidgets.QTableWidgetItem(book['copies_in_stock']))
+
+            # Set columns 0 and 3 as non-editable
+            item_0 = self.books_table.item(row, 0)
+            item_0.setFlags(item_0.flags() ^ Qt.ItemIsEditable)
+            item_3 = self.books_table.item(row, 3)
+            item_3.setFlags(item_3.flags() ^ Qt.ItemIsEditable)
+
             btn1 = QPushButton(self.books_table)
             btn1.setText('Save')
             btn1.setStyleSheet('background-color: rgb(255, 255, 255); color: rgb(233, 164, 30); '
@@ -1861,7 +1985,7 @@ class AdministratorScreen(QDialog):
             self.books_edit_buttons.append(btn1)
 
             btn1.clicked.connect(lambda state, x=row: self.edit_book(x))
-            self.books_table.setCellWidget(row, 3, btn1)
+            self.books_table.setCellWidget(row, 4, btn1)
             btn2 = QPushButton(self.books_table)
             btn2.setText('Delete')
             btn2.setStyleSheet('background-color: rgb(255, 255, 255); color: rgb(197, 29, 29); '
@@ -1869,7 +1993,7 @@ class AdministratorScreen(QDialog):
             btn2.setObjectName(f'delete_{book["isbn"]}')
             self.books_delete_buttons.append(btn2)
             btn2.clicked.connect(lambda state, x=len(self.books_delete_buttons) - 1: self.delete_book(x))
-            self.books_table.setCellWidget(row, 4, btn2)
+            self.books_table.setCellWidget(row, 5, btn2)
             row += 1
 
     def edit_book(self, row):
@@ -1989,6 +2113,7 @@ class AdministratorScreen(QDialog):
                 self.load_pending(response['sorted_borrow_requests']['pending'])
                 self.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
 
@@ -2109,5 +2234,24 @@ class AdministratorScreen(QDialog):
                 self.load_pending(response['sorted_borrow_requests']['pending'])
                 self.load_borrow(response['sorted_borrow_requests']['others'])
         except Exception as err:
+            raise err
             print("Error:", err)
             sys.exit(self.app.exec_())
+
+    def do_search(self):
+        filter_by = self.search_field.text()
+
+        request = {
+            'method': 'admin-filter-books',
+            'session_key': session_key,
+            'filter_by': filter_by
+        }
+
+        response = send_request(request)
+
+        if response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
+            login = LoginScreen(self.app, self.widget)
+            self.widget.addWidget(login)
+            self.widget.setCurrentIndex(self.widget.currentIndex() + 1)
+        else:
+            self.load_books(response["books"])

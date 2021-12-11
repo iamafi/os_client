@@ -10,7 +10,7 @@
 
 
 #define PORT 8080
-#define JSON_MAX_SIZE 32768
+#define JSON_MAX_SIZE 65536
 
 
 char in_filename[] = "input.json", out_filename[] = "output.json"; 
