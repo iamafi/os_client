@@ -1082,7 +1082,7 @@ class PendingButtonsWidget(QWidget):
                 msg.setIcon(QMessageBox.Critical)
                 msg.exec_()
             elif response["result"] == 'session-incorrect' or response['result'] == 'permission-denied':
-                login = LoginScreen(self.app, self.parent.widget)
+                login = LoginScreen(self.parent.app, self.parent.widget)
                 self.parent.widget.addWidget(login)
                 self.parent.widget.setCurrentIndex(self.parent.widget.currentIndex() + 1)
                 return
